@@ -1,0 +1,33 @@
+[INFO] CSV saved to temp: C:\Users\devic\AppData\Local\Temp\tmp_pkowvgb\sample.csv
+[INFO] CSV loaded successfully with 2 rows.
+[ERROR] Processing failed for Menon M: Failed: [WinError 2] The system cannot find the file specified
+Traceback (most recent call last):
+  File "C:\Users\devic\backend\app\main.py", line 90, in process_csv
+  File "C:\Users\devic\backend\app\generator.py", line 51, in generate_certificate
+    convert_docx_to_pdf(output_docx, output_pdf)
+  File "C:\Users\devic\backend\app\generator.py", line 26, in convert_docx_to_pdf
+    subprocess.run([
+  File "C:\Users\devic\AppData\Local\Programs\Python\Python310\lib\subprocess.py", line 501, in run
+    with Popen(*popenargs, **kwargs) as process:
+  File "C:\Users\devic\AppData\Local\Programs\Python\Python310\lib\subprocess.py", line 966, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Users\devic\AppData\Local\Programs\Python\Python310\lib\subprocess.py", line 1435, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+[ERROR] Processing failed for Shiva S: Failed: [WinError 2] The system cannot find the file specified
+Traceback (most recent call last):
+  File "C:\Users\devic\backend\app\main.py", line 90, in process_csv
+  File "C:\Users\devic\backend\app\generator.py", line 51, in generate_certificate
+    convert_docx_to_pdf(output_docx, output_pdf)
+  File "C:\Users\devic\backend\app\generator.py", line 26, in convert_docx_to_pdf
+    subprocess.run([
+  File "C:\Users\devic\AppData\Local\Programs\Python\Python310\lib\subprocess.py", line 501, in run
+    with Popen(*popenargs, **kwargs) as process:
+  File "C:\Users\devic\AppData\Local\Programs\Python\Python310\lib\subprocess.py", line 966, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Users\devic\AppData\Local\Programs\Python\Python310\lib\subprocess.py", line 1435, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+
+[INFO] Temporary directory removed: C:\Users\devic\AppData\Local\Temp\tmp_pkowvgb
