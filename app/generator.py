@@ -2,9 +2,17 @@
 from docx import Document
 import os
 import subprocess
+import shutil
+import platform
 
-# Change this path to where LibreOffice is installed on your machine
-LIBREOFFICE_PATH = r"C:\Program Files\LibreOffice\program\soffice.exe"
+
+# Detect system and set LibreOffice path dynamically
+if platform.system() == "Windows":
+    LIBREOFFICE_PATH = r"C:\Program Files\LibreOffice\program\soffice.exe"
+else:
+    # On Linux (Render container), soffice will be installed from apt-get
+    LIBREOFFICE_PATH = shutil.which("soffice") or "/usr/bin/soffice"
+
 
 def replace_text_in_docx(input_docx_path, output_docx_path, replacements):
     """Replace placeholders in DOCX template and save new DOCX."""
@@ -16,32 +24,35 @@ def replace_text_in_docx(input_docx_path, output_docx_path, replacements):
                     run.text = run.text.replace(old, new)
     doc.save(output_docx_path)
 
+
 def convert_docx_to_pdf(input_docx_path, output_pdf_path):
     """
     Convert DOCX to PDF using LibreOffice in headless mode.
-    Works on Windows by calling the full path to soffice.exe.
+    Works both on Windows and Linux (Render).
     """
-    if not os.path.exists(LIBREOFFICE_PATH):
+    if not LIBREOFFICE_PATH or not os.path.exists(LIBREOFFICE_PATH):
         raise FileNotFoundError(f"LibreOffice not found at: {LIBREOFFICE_PATH}")
 
     output_dir = os.path.dirname(output_pdf_path)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
 
-    # Run LibreOffice conversion
+    # Run LibreOffice in headless mode
     subprocess.run([
         LIBREOFFICE_PATH, "--headless", "--convert-to", "pdf", "--outdir", output_dir, input_docx_path
     ], check=True)
 
-    # LibreOffice uses original filename for output
+    # LibreOffice generates file with original name but .pdf extension
     generated_pdf = os.path.join(
         output_dir,
         os.path.splitext(os.path.basename(input_docx_path))[0] + ".pdf"
     )
+
     if not os.path.exists(generated_pdf):
         raise FileNotFoundError(f"PDF was not generated for {input_docx_path}")
 
+    # Rename to desired output path
     os.rename(generated_pdf, output_pdf_path)
+
 
 def generate_certificate(row, template_file, output_dir='.'):
     """Generate certificate from template with replaced placeholders."""
@@ -53,8 +64,7 @@ def generate_certificate(row, template_file, output_dir='.'):
         '<DOMAIN>': row_domain,
     }
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
 
     output_docx = os.path.join(output_dir, f'{row_name}_Certificate.docx')
     output_pdf = os.path.join(output_dir, f'DNYX-Completion-{row_name}.pdf')
@@ -68,6 +78,7 @@ def generate_certificate(row, template_file, output_dir='.'):
     os.remove(output_docx)  # Remove intermediate DOCX file
     return output_pdf
 
+
 def generate_offer_letter(row, template_file, output_dir='.'):
     """Generate offer letter from template with replaced placeholders."""
     row_name = row['Name'].strip()
@@ -78,8 +89,7 @@ def generate_offer_letter(row, template_file, output_dir='.'):
         '<DOMAIN>': row_domain,
     }
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
 
     output_docx = os.path.join(output_dir, f'{row_name}_OfferLetter.docx')
     output_pdf = os.path.join(output_dir, f'DNYX-OfferLetter-{row_name}.pdf')
