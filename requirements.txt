@@ -3,3 +3,5 @@ uvicorn
 pandas
 python-docx
 docx2pdf
+python-dateutil
+python-multipart
