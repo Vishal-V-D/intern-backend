@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import pandas as pd
@@ -11,6 +12,21 @@ from .emailer import SendEmail
 
 app = FastAPI(title="Completion Automation API")
 
+# ------------------- CORS SETUP -------------------
+origins = [
+    "http://localhost:3000","http://localhost:8000","http://localhost:5173" ,"http://localhost:8080" ,     
+    
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ------------------- CONFIG -------------------
 TEMPLATE_FILE = os.path.join("templates", "TEMPLATE.docx")
 OFFER_TEMPLATE_FILE = os.path.join("templates", "offertemplate.docx")
 OUTPUT_DIR = "output"
@@ -19,14 +35,18 @@ if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
 
+# ------------------- HELPERS -------------------
 def replace_placeholders(text: str, name: str, role: str) -> str:
     return text.replace('<NAME>', name).replace('<ROLE>', role)
 
+def replace_offer_placeholders(text: str, name: str, domain: str) -> str:
+    return text.replace('<NAME>', name).replace('<DOMAIN>', domain)
 
+
+# ------------------- REQUEST MODELS -------------------
 class GenerateRequest(BaseModel):
     name: str
     role: str
-
 
 class EmailRequest(BaseModel):
     email: str
@@ -41,6 +61,7 @@ Your Company
 """
 
 
+# ------------------- ROUTES -------------------
 @app.post("/generate_certificate_only")
 async def generate_certificate_only(req: GenerateRequest):
     try:
@@ -126,7 +147,6 @@ async def process_csv(csv_file: UploadFile = File(...), send_email: bool = True)
     return {"results": results}
 
 
-# 4️⃣ Generate and send certificate in one go
 @app.post("/generate_and_send_certificate")
 async def generate_and_send_certificate(req: EmailRequest):
     try:
@@ -138,10 +158,6 @@ async def generate_and_send_certificate(req: EmailRequest):
         return {"status": "success", "message": f"Certificate generated and sent to {req.email}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-# Helper to replace placeholders for offer letter
-def replace_offer_placeholders(text: str, name: str, domain: str) -> str:
-    return text.replace('<NAME>', name).replace('<DOMAIN>', domain)
 
 
 @app.post("/send_offer_letter")
