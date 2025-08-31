@@ -15,7 +15,7 @@ app = FastAPI(title="Completion Automation API")
 # ------------------- CORS SETUP -------------------
 origins = [
     "http://localhost:3000","http://localhost:8000","http://localhost:5173" ,"http://localhost:8080" ,   "https://hrms-ten-theta.vercel.app/","https://dnyx-hrms.vercel.app/",
-    
+    "https://hrms.dnyx.in/recruitment/create-job",
 ]
 
 app.add_middleware(
